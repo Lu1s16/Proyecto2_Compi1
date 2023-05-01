@@ -2,6 +2,7 @@ import { TipoPrimitivo } from "./Simbolos/TipoPrimitivo";
 import { Variable } from "./Simbolos/Variable"
 import { Tabla_simbolos, ListaTabla } from "../Reportes/Tabla_simbolos";
 import { Funcion } from "../Instrucciones/Funcion";
+import { Lista } from "./Simbolos/Lista";
 
 
 export class Ambito {
@@ -9,6 +10,7 @@ export class Ambito {
     private variables = new Map<string, Variable>();
     public name : string;
     private funciones = new Map<string, Funcion>();
+    private listas = new Map<string, Lista>();
 
     //tendra un ambito
     constructor(private anterior: Ambito | null, name: string){
@@ -36,6 +38,8 @@ export class Ambito {
             //Guarda la variable en una tabla de simbolos
             env.variables.set(id.toLowerCase(), new Variable(valor, id, tipo));
 
+            //en el push se esta metiendo un objeto de tabla_simbolo
+            //Esta es mi tabla de simbolos
             ListaTabla.push( new Tabla_simbolos(id, tipo, this.name, linea, columna))
 
 
@@ -181,6 +185,55 @@ export class Ambito {
 
         //retorna el ambito global
         return env;
+
+    }
+
+
+    public guardarlista(id: string, tipo: TipoPrimitivo, line:number, column:number) {
+
+        let env: Ambito | null = this;
+
+        console.log("Estoy guardando la lista: " + id);
+
+        if(!env.listas.has(id.toLowerCase())){
+            //Si no lo tiene se guarda
+
+            env.listas.set(id.toLowerCase(), new Lista(id, tipo));
+
+
+            //luego lo meto a la tabla de simbolos
+
+
+        } else {
+
+            console.log("Error: Ya existe la lista");
+
+        }
+
+    }
+
+    public getLista(id: string): Lista | null{
+
+        let env: Ambito | null = this;
+
+
+        while(env != null){
+
+
+            if(env.listas.has(id.toLowerCase())){
+
+                return env.listas.get(id.toLowerCase())!;
+
+            }
+
+            env = env.anterior;
+
+
+        }
+
+
+        return null;
+
 
     }
 

@@ -396,7 +396,7 @@ export class OperacionAritmetica extends Expresion {
 
         }
 
-        return {value: "Error", type: TipoPrimitivo.Null};
+        return {value: null, type: TipoPrimitivo.Null};
         
         
 

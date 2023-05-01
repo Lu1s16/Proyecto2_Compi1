@@ -120,6 +120,14 @@
         let Logicas                     =   require("../Expresiones/Logicas").Logicas;
         let Parametros                  =   require("../Expresiones/Parametros").Parametros;
         let LlamadaFuncion              =   require("../Expresiones/LlamadaFuncion").LlamadaFuncion;
+        let ToLower                     =   require("../Expresiones/ToLower").ToLower;
+        let ToUpper                     =   require("../Expresiones/ToUpper").ToUpper;
+        let Truncate                    =   require("../Expresiones/Truncate").Truncate;
+        let Round                       =   require("../Expresiones/Round").Round;
+        let Typeof                      =   require("../Expresiones/Typeof").Typeof;
+        let ToString                    =   require("../Expresiones/ToString").ToString;
+        let Casteo                      =   require("../Expresiones/Casteo").Casteo;
+        let AccederLista                =   require("../Expresiones/AccederLista").AccederLista;
         let Return                      =   require("../Expresiones/Return").ReturnExpression;
 
         /*Instrucciones*/
@@ -128,7 +136,12 @@
         let Asignar                     =   require("../Instrucciones/Asignar").Asignar;
         let Funcion                     =   require("../Instrucciones/Funcion").Funcion;
         let Statement                   =   require("../Instrucciones/Statement").Statement;
-%}
+        let DeclararLista               =   require("../Instrucciones/DeclararLista").DeclararLista;
+        let PushLista                   =   require("../Instrucciones/PushLista").PushLista;
+
+
+%}      
+
 
 
 /* ================= ASOCIATIVIDAD y PRECEDENCIA DE OPERADORES ===============
@@ -172,8 +185,8 @@ INSTRUCCION : DEC_VAR                   { $$ = $1; }
               | ASIG_VAR                { $$ = $1; }
               | DEC_VEC 
               | MOD_VEC
-              | DEC_LIST
-              | ADD_LIST
+              | DEC_LIST                { $$ = $1; }
+              | ADD_LIST                { $$ = $1; }
               | MOD_LIST
               | IF
               | SWITCH_CASE
@@ -215,11 +228,11 @@ MOD_VEC : ACC_VEC '=' EXPRESIONES ';'
 ;
 
 
-DEC_LIST : list '<' TIPO '>' id '=' new list '<' TIPO '>' ';'  {console.log("Se declaro la lista: " + $5); }
+DEC_LIST : list '<' TIPO '>' id '=' new list '<' TIPO '>' ';'  { $$ = new DeclararLista($5, $3, @1.first_line, @1.first_column); }
          | list '<' TIPO '>' id '=' TO_CHAR_ARRAY ';'
 ;
 
-ADD_LIST : id '.' add '(' EXPRESIONES ')' ';' {console.log("Se agrego: "+ $5 + " en la lista: " + $1)}
+ADD_LIST : id '.' add '(' EXPRESIONES ')' ';'  { $$ = new PushLista($1, $5, @1.first_line, @1.first_column); }
 ;
 
 MOD_LIST : ACC_LIST  '=' EXPRESIONES ';'
@@ -316,10 +329,10 @@ PRINT : print '(' EXPRESIONES ')' ';' { $$ = new Print(@1.first_line, @1.first_c
 
 
 
-TO_LOWER : toLower '(' EXPRESIONES ')'
+TO_LOWER : toLower '(' EXPRESIONES ')' { $$ = new ToLower($3, @1.first_line, @1.first_column); }
 ;
 
-TO_UPPER : toUpper '(' EXPRESIONES ')'
+TO_UPPER : toUpper '(' EXPRESIONES ')' { $$ = new ToUpper($3, @1.first_line, @1.first_column); }
 ;
 
 LENGTH : length '(' EXP_LENGT ')'
@@ -330,18 +343,16 @@ EXP_LENGT : id
           | id '[' EXPRESIONES ']'
 ;
 
-TRUNCATE : truncate '(' entero ')'
-         | truncate '(' decimal ')'
-         | truncate '(' id ')'
+TRUNCATE : truncate '(' EXPRESIONES ')' { $$ = new Truncate($3, @1.first_line, @1.first_column); }
 ;
 
-ROUND : round '(' EXPRESIONES ')'
+ROUND : round '(' EXPRESIONES ')' { $$ = new Round($3, @1.first_line, @1.first_column); }
 ;
 
-TYPE_OF : typeof '(' EXPRESIONES ')'
+TYPE_OF : typeof '(' EXPRESIONES ')' { $$ = new Typeof($3, @1.first_line, @1.first_column); }
 ;
 
-TO_STRING : tostring '(' EXPRESIONES ')'
+TO_STRING : tostring '(' EXPRESIONES ')' { $$ = new ToString($3, @1.first_line, @1.first_column); }
 ;
 
 TO_CHAR_ARRAY : tochararray '(' EXPRESIONES ')'
@@ -356,13 +367,13 @@ MAIN : main id '(' ')'
 OP_TERNARIO : EXPRESIONES '?' EXPRESIONES ':' EXPRESIONES { $$ = new Ternario($1, $3, $5, @1.first_line, @1.first_column) }
 ;
 
-CASTEO : '(' TIPO ')' EXPRESIONES
+CASTEO : '(' TIPO ')' EXPRESIONES  { $$ = new Casteo($2, $4, @1.first_line, @1.first_column); }
 ;
 
 ACC_VEC : id '[' EXPRESIONES ']'
 ;
 
-ACC_LIST: id '[' '[' EXPRESIONES ']' ']'
+ACC_LIST: id '[' '[' EXPRESIONES ']' ']'  { $$ = new AccederLista($1, $4, @1.first_line, @1.first_column); }
 ;
 
 
@@ -371,20 +382,20 @@ ACC_LIST: id '[' '[' EXPRESIONES ']' ']'
 
 EXPRESIONES : ARITMETICAS               { $$ = $1; }
             | '(' EXPRESIONES ')'       { $$ = $2; }
-            | RELACIONALES              { $$ = $1; console.log("Sube el relacional"); }
-            | LOGICOS
-            | ACC_LIST
+            | RELACIONALES              { $$ = $1; }
+            | LOGICOS                   { $$ = $1; }
+            | ACC_LIST                  { $$ = $1; }
             | ACC_VEC
             | LENGTH
             | LLAMADA                   { $$ = $1; }
-            | CASTEO
-            | TO_UPPER
-            | TO_LOWER
+            | CASTEO                    { $$ = $1; }
+            | TO_UPPER                  { $$ = $1; }
+            | TO_LOWER                  { $$ = $1; }
             | TO_CHAR_ARRAY
-            | TO_STRING
-            | TYPE_OF
-            | ROUND
-            | TRUNCATE
+            | TO_STRING                 { $$ = $1; }
+            | TYPE_OF                   { $$ = $1; }
+            | ROUND                     { $$ = $1; }
+            | TRUNCATE                  { $$ = $1; }
             | OP_TERNARIO               { $$ = $1; }
             | id                        { $$ = new Acceso($1, @1.first_line, @1.first_column); }
             | PRIMITIVOS                { $$ = $1; }        
@@ -409,7 +420,7 @@ ARITMETICAS : EXPRESIONES '+' EXPRESIONES       {  $$ = new OperacionAritmetica(
             | EXPRESIONES '/' EXPRESIONES       {  $$ = new OperacionAritmetica($1, $2, $3, @1.first_line, @2.first_column); } 
             | EXPRESIONES '^' EXPRESIONES       {  $$ = new OperacionAritmetica($1, $2, $3, @1.first_line, @2.first_column); } 
             | EXPRESIONES '%' EXPRESIONES       {  $$ = new OperacionAritmetica($1, $2, $3, @1.first_line, @2.first_column); } 
-            | '-' EXPRESIONES %prec negacion    {  $$ = new OperacionAritmetica($1, $2, $3, @1.first_line, @2.first_column); }
+            | '-' EXPRESIONES %prec negacion    
 ;
 
 RELACIONALES : EXPRESIONES '==' EXPRESIONES     {  $$  = new Relacional($1, $2, $3, @1.first_line, @1.first_column); }

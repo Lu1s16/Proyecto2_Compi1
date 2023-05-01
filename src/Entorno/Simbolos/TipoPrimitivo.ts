@@ -5,5 +5,7 @@ export enum TipoPrimitivo {
     Char = 3,
     String = 4,
     Null = 5,
-    Return = 6
+    Return = 6,
+    Lista = 7,
+    Vector = 8
 }

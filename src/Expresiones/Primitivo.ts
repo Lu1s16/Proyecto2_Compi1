@@ -14,12 +14,12 @@ export class Primitivo extends Expresion {
 
     //Sirve para guardar el valor entero, char, string etc.
     public Get(): Return {
-        //console.log("Existe la variable")
+        //console.log("Estoy accediento a la variable primitiva: "+ this.value);
         //Retorna el valor de la variable declarada con valor.
 
         switch (this.tipo) {
             case TipoPrimitivo.Integer:
-                console.log("agarra el: "+ this.value);
+                //console.log("agarra el: "+ this.value);
                 return { value: parseInt(this.value), type: TipoPrimitivo.Integer};
 
             case TipoPrimitivo.Double:

@@ -40,13 +40,15 @@ export class Analizador{
                     //    inst.Ejecutar(globalEnv);
                     //}
 
-                    if(inst instanceof Funcion) {
-                        //Si es funcion la guarda
-                        inst.Ejecutar(globalEnv);
-                    } else {
-                        console.log("Instruccion: " + inst);
-                        inst.Ejecutar(globalEnv);
-                    }
+                    //if(inst instanceof Funcion) {
+                    //    //Si es funcion la guarda
+                    //    inst.Ejecutar(globalEnv);
+                    //} else {
+                    //    //console.log("Instruccion: " + inst);
+                    //    inst.Ejecutar(globalEnv);
+                    //}
+
+                    inst.Ejecutar(globalEnv);
 
 
 
