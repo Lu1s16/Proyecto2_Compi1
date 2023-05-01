@@ -1,0 +1,191 @@
+import { TipoPrimitivo } from "./Simbolos/TipoPrimitivo";
+import { Variable } from "./Simbolos/Variable"
+import { Tabla_simbolos, ListaTabla } from "../Reportes/Tabla_simbolos";
+import { Funcion } from "../Instrucciones/Funcion";
+
+
+export class Ambito {
+    //Map de simbolos, llave: valor(id) valor: simbolo
+    private variables = new Map<string, Variable>();
+    public name : string;
+    private funciones = new Map<string, Funcion>();
+
+    //tendra un ambito
+    constructor(private anterior: Ambito | null, name: string){
+        //Nuevo map para variables
+        this.variables = new Map<string, Variable>();
+        this.name = name
+        
+
+
+        //Se puede tener un map para las listas, vectores, funciones y metodos
+    }
+
+    //Este metodo guarda las variables en un entorno
+    public guardar(id: string, valor: any, tipo: TipoPrimitivo, linea: number, columna:number ){
+
+        //Verificar el ambito
+        let env: Ambito | null = this;
+
+        //Verificar que exista la variable
+        console.log("Estoy guardando la variable: " + id);
+        if(!env.variables.has(id.toLowerCase())){
+            //En este caso aun no esta la variable que definimos
+
+            //Guarda la variable
+            //Guarda la variable en una tabla de simbolos
+            env.variables.set(id.toLowerCase(), new Variable(valor, id, tipo));
+
+            ListaTabla.push( new Tabla_simbolos(id, tipo, this.name, linea, columna))
+
+
+        } else {
+
+            console.log("Error: ya existe la variable")
+        }
+
+    }
+
+    //guarda las variables por default
+    public guardar_default(id: string, valor: any, tipo: TipoPrimitivo, linea: number, columna:number ){
+
+        //Verificar el ambito
+        let env: Ambito | null = this;
+
+        //Verificar que exista la variable
+        console.log("Estoy guardando la variable por defecto: " + id);
+        if(!env.variables.has(id.toLowerCase())){
+            //En este caso aun no esta la variable que definimos
+
+            //Guarda la variable
+            //Guarda la variable en una tabla de simbolos
+            env.variables.set(id.toLowerCase(), new Variable(valor, id, tipo));
+
+            ListaTabla.push( new Tabla_simbolos(id, tipo, this.name, linea, columna))
+
+
+        } else {
+
+            console.log("Error: ya existe la variable declarada")
+        }
+
+    }
+
+    //asignar nuevo valor a una variable
+    public actualizar_var(id: string, valor: any, tipo: TipoPrimitivo, linea: number, columna:number ){
+
+        //Verificar el ambito
+        let env: Ambito | null = this;
+
+        //Verificar que exista la variable
+        console.log("Estoy actualizando la variable: " + id);
+        if(!env.variables.has(id.toLowerCase())){
+            //Si aun no existe se guarda la variable
+
+  
+            env.variables.set(id.toLowerCase(), new Variable(valor, id, tipo));
+
+            ListaTabla.push( new Tabla_simbolos(id, tipo, this.name, linea, columna))
+
+
+        } else {
+            //si ya existe se actualiza su valor
+            env.variables.set(id.toLowerCase(), new Variable(valor, id, tipo));
+
+            //console.log("Error: ya existe la variable declarada")
+        }
+
+    }
+
+
+
+
+
+
+    //Obtener una variable de un entorno
+    public getVar(id: string): Variable | null {
+
+        //Verificar el ambito
+        let env: Ambito | null = this;
+
+        //Buscar la variable en el entorno actual
+        while(env != null){
+
+            //Verificar que exista la variable
+            
+            if(env.variables.has(id.toLowerCase())){
+                
+                return env.variables.get(id.toLowerCase())!;
+            }
+
+            env = env.anterior;
+        }
+
+        return null;
+
+    }
+
+    //Guardar la funcion
+    public guardarFuncion(id: string, funcion: Funcion) {
+
+        //Verificar el ambito
+        let env: Ambito | null = this;
+
+        //verificar si la funcion ya existe
+        if(!env.funciones.has(id.toLowerCase())) {
+            //guardo la variable en el entorno de la funcion enviada
+
+            console.log("Se guardo la funcion: "+ id);
+            env.funciones.set(id.toLowerCase(), funcion);
+
+        } else {
+           console.log("Error: la funcion: "+ id + " ya existe en el entorno")
+        }
+
+    }
+
+    //Obtiene la funcion a ser llamada
+    public getFuncion(id: string): Funcion | null {
+
+        //verifica el ambito
+        let env: Ambito | null = this;
+
+        //busca la variable de la funcion
+        while(env != null){
+
+            //verificar que si existe
+            if(env.funciones.has(id.toLowerCase())){
+                return env.funciones.get(id.toLocaleLowerCase())!;
+            }
+
+            //cambia de entorno
+            env = env.anterior
+
+        }
+
+        //retorna null ya que no esta la funcion
+        return null;
+
+    }
+
+    //Obtiene el ambito global
+    public getGlobal(): Ambito {
+        let env:Ambito | null = this;
+
+        //Busca la variable del entorno global
+        while(env.anterior != null) {
+
+            //va regresando hasta llegar al entorno global
+            env = env.anterior;
+        }
+
+        //retorna el ambito global
+        return env;
+
+    }
+
+}
+
+function timeout(arg0: () => void, timeout: any): TipoPrimitivo {
+    throw new Error("Function not implemented.");
+}
