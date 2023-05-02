@@ -35,6 +35,7 @@ export class AccederLista extends Expresion {
             }
 
             console.log("Error: la posicion no es de tipo entero")
+            return { value: null, type: TipoPrimitivo.Null };
 
            
         }

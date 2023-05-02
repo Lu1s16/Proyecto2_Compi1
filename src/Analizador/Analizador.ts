@@ -3,6 +3,8 @@ import { printlist } from "../Reportes/PrintList";
 import { Ambito } from "../Entorno/Ambito";
 import { Declarar } from "../Instrucciones/Declarar";
 import { Funcion } from "../Instrucciones/Funcion";
+import { Metodo } from "../Instrucciones/Metodo";
+import { Main } from "../Instrucciones/Main";
 
 export class Analizador{
 
@@ -29,35 +31,27 @@ export class Analizador{
             try{
                 printlist.splice(0, printlist.length);
 
-                const globalEnv = new Ambito(null, "Global");
+                const globalEnv = new Ambito(null);
 
                 for(const inst of ast){
                     //Solo ejecuta funciones y declaraciones
                     //no ejecuta main ni tampoco ciclos, etc.
-                    //if(inst instanceof Declarar){
-                    //    inst.Ejecutar(globalEnv);
-                    //} else if(inst instanceof Funcion){
-                    //    inst.Ejecutar(globalEnv);
-                    //}
-
-                    //if(inst instanceof Funcion) {
-                    //    //Si es funcion la guarda
-                    //    inst.Ejecutar(globalEnv);
-                    //} else {
-                    //    //console.log("Instruccion: " + inst);
-                    //    inst.Ejecutar(globalEnv);
-                    //}
-
-                    inst.Ejecutar(globalEnv);
-
-
-
-                    
-                    //console.log("------")
-                    //console.log("Instruccion: " + inst)
+                    if(inst instanceof Declarar){
+                        inst.Ejecutar(globalEnv);
+                    } else if(inst instanceof Funcion){
+                        inst.Ejecutar(globalEnv);
+                    } else if(inst instanceof Metodo){
+                        inst.Ejecutar(globalEnv);
+                    }
                 }
 
-                return ast;
+                for(const inst of ast){
+                    if(inst instanceof Main){
+                        inst.Ejecutar(globalEnv);
+                    }
+                }
+
+                return printlist.join("\n");
 
 
 

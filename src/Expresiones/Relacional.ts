@@ -16,7 +16,7 @@ export class Relacional extends Expresion {
 
     public Get(env: Ambito): Return {
 
-        console.log("entra a clase Relacional")
+        //console.log("entra a clase Relacional")
 
 
 

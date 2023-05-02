@@ -1,7 +1,7 @@
 import { Instruccion } from "../Entorno/Instruccion";
 import { Ambito } from "../Entorno/Ambito";
 import { Expresion } from "../Entorno/Expresion";
-import { ReturnExpression } from "../Expresiones/Return";
+import { ReturnExpresion } from "../Expresiones/ReturnExpresion";
 
 
 export class Statement extends Instruccion {
@@ -14,24 +14,36 @@ export class Statement extends Instruccion {
     public Ejecutar(env: Ambito) {
         
         //Crea un nuevo ambito
-        const newEnv = new Ambito(env, "Funcion");
+        const newEnv = new Ambito(env);
 
         //body contienen todas las instrucciones de la funcion
         for(const instrucciones of this.body) {
 
+            //console.log("Instruccion: "+instrucciones.Ejecutar(newEnv));
+
             try{
 
-                if(instrucciones instanceof ReturnExpression){
-                    instrucciones.Get(newEnv);
-                    console.log("Instruccion de return")
+                //Verifico si la instruccion es return
+                if(instrucciones instanceof ReturnExpresion){
 
+                    //si lo es hago un Get porqu es expresion
+                    const ret = instrucciones.Get(newEnv);
+                    //console.log("Ret: "+ret);
+
+                    if(ret != null && ret != undefined){
+                        return ret;
+                    }
+                    
                 } else {
-                    instrucciones.Ejecutar(newEnv);
+                    const ret = instrucciones.Ejecutar(newEnv);
+                    //console.log("Ret: "+ret);
+
+                    if(ret != null && ret != undefined){
+                        return ret;
+                    }
 
                 }
 
-                //const ret = instrucciones.Ejecutar(newEnv);
-                //si la instruccion es un return, retorna el valor
                 
 
             }catch(e){
@@ -39,7 +51,6 @@ export class Statement extends Instruccion {
             }
 
         }
-
 
     }
 

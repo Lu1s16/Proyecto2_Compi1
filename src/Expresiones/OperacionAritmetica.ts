@@ -22,7 +22,7 @@ export class OperacionAritmetica extends Expresion {
         //--------SUMA------
         if(this.operador == "+"){
 
-            console.log("suma");
+            //console.log("suma");
 
             //obtengo el valor
             const op1 = this.exp1.Get(env);
@@ -121,23 +121,23 @@ export class OperacionAritmetica extends Expresion {
                     //Si alguno es booleano
                     if(op1.type == TipoPrimitivo.Boolean) {
 
-                        op1.value = op1.value ? 1 : 0;
-
                         op1.value.toString();
+
+                        
                     }
                     if(op2.type == TipoPrimitivo.Boolean){
-                        op2.value = op2.value ? 1.0 : 0.0;
                         op2.value.toString();
+                    
                     }
 
                     //Verificar si algun operando es caracter
                     if(op1.type == TipoPrimitivo.Char){
-                        op1.value = op1.value.charCodeAt(0);
+                        //op1.value = op1.value.charCodeAt(0);
                         op1.value.toString();
 
                     }
                     if(op2.type == TipoPrimitivo.Char){
-                        op2.value = op2.value.charCodeAt(0);
+                        //op2.value = op2.value.charCodeAt(0);
                         op2.value.toString();
 
                     }
@@ -395,6 +395,7 @@ export class OperacionAritmetica extends Expresion {
             }
 
         }
+        console.log("Erro: operacion aritmetica no valida")
 
         return {value: null, type: TipoPrimitivo.Null};
         

@@ -10,7 +10,7 @@ export class Funcion extends Instruccion {
     }
 
     public Ejecutar(env: Ambito) {
-        env.guardarFuncion(this.id, this);
+        env.guardarFuncion(this.id, this, this.line, this.column);
     }
 
 

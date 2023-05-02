@@ -12,7 +12,7 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: false}))
 
 app.get("/", (req, res) =>{
-    res.render("principal.ejs", {titulo: "Prueba titulo", codigo: ""});
+    res.render("principal.ejs", {titulo: "Interprete", codigo: "", consola: ""});
 
 })
 
@@ -26,9 +26,9 @@ app.post("/ejecutar", (req, res) => {
     let texto = req.body.codigo;
     //console.log(texto)
     let analizador = new Analizador(texto, "editor");
-    let ast: any = analizador.Analizar();
+    let console: any = analizador.Analizar();
 
-    res.send("se recibio: " + texto);
+    res.render("principal.ejs", { titulo: "Interprete", codigo: texto, consola: console })
 })
 
 app.listen(3000, () => {

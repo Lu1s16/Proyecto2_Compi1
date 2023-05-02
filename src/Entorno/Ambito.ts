@@ -3,20 +3,25 @@ import { Variable } from "./Simbolos/Variable"
 import { Tabla_simbolos, ListaTabla } from "../Reportes/Tabla_simbolos";
 import { Funcion } from "../Instrucciones/Funcion";
 import { Lista } from "./Simbolos/Lista";
+import { Vector } from "./Simbolos/Vector";
+import { Expresion } from "./Expresion";
+import { Metodo } from "../Instrucciones/Metodo";
 
 
 export class Ambito {
     //Map de simbolos, llave: valor(id) valor: simbolo
     private variables = new Map<string, Variable>();
-    public name : string;
+    
     private funciones = new Map<string, Funcion>();
     private listas = new Map<string, Lista>();
+    private vectores = new Map<string, Vector>();
+    private metodos = new Map<string, Metodo>();
 
     //tendra un ambito
-    constructor(private anterior: Ambito | null, name: string){
+    constructor(private anterior: Ambito | null){
         //Nuevo map para variables
         this.variables = new Map<string, Variable>();
-        this.name = name
+        
         
 
 
@@ -40,7 +45,7 @@ export class Ambito {
 
             //en el push se esta metiendo un objeto de tabla_simbolo
             //Esta es mi tabla de simbolos
-            ListaTabla.push( new Tabla_simbolos(id, tipo, this.name, linea, columna))
+            ListaTabla.push( new Tabla_simbolos(id, tipo, "ambito" , linea, columna))
 
 
         } else {
@@ -65,7 +70,7 @@ export class Ambito {
             //Guarda la variable en una tabla de simbolos
             env.variables.set(id.toLowerCase(), new Variable(valor, id, tipo));
 
-            ListaTabla.push( new Tabla_simbolos(id, tipo, this.name, linea, columna))
+            ListaTabla.push( new Tabla_simbolos(id, tipo, "ambito", linea, columna))
 
 
         } else {
@@ -88,9 +93,6 @@ export class Ambito {
 
   
             env.variables.set(id.toLowerCase(), new Variable(valor, id, tipo));
-
-            ListaTabla.push( new Tabla_simbolos(id, tipo, this.name, linea, columna))
-
 
         } else {
             //si ya existe se actualiza su valor
@@ -130,7 +132,7 @@ export class Ambito {
     }
 
     //Guardar la funcion
-    public guardarFuncion(id: string, funcion: Funcion) {
+    public guardarFuncion(id: string, funcion: Funcion, line:number, column:number) {
 
         //Verificar el ambito
         let env: Ambito | null = this;
@@ -142,7 +144,10 @@ export class Ambito {
             console.log("Se guardo la funcion: "+ id);
             env.funciones.set(id.toLowerCase(), funcion);
 
+            ListaTabla.push( new Tabla_simbolos(id, TipoPrimitivo.Funcion, "ambito", line, column))
+
         } else {
+
            console.log("Error: la funcion: "+ id + " ya existe en el entorno")
         }
 
@@ -159,7 +164,7 @@ export class Ambito {
 
             //verificar que si existe
             if(env.funciones.has(id.toLowerCase())){
-                return env.funciones.get(id.toLocaleLowerCase())!;
+                return env.funciones.get(id.toLowerCase())!;
             }
 
             //cambia de entorno
@@ -171,6 +176,43 @@ export class Ambito {
         return null;
 
     }
+
+    public guardarMetodo(id: string, metodo: Metodo, line: number, column: number){
+
+        //verificar ambito
+        let env: Ambito | null = this;
+
+        if(!env.metodos.has(id.toLowerCase())){
+
+            console.log("Se guardo el metodo: "+ id);
+            env.metodos.set(id.toLocaleLowerCase(), metodo)
+
+
+        } else {
+            console.log("Erro: el metodo "+ id + " ya existe");
+        }
+
+    }
+
+    public getMetodo(id: string): Metodo | null {
+
+        let env: Ambito | null = this;
+
+        while(env != null){
+
+            if(env.metodos.has(id.toLowerCase())){
+                return env.metodos.get(id.toLowerCase())!;
+
+            }
+
+            env = env.anterior
+
+        }
+
+        return null
+
+    }
+
 
     //Obtiene el ambito global
     public getGlobal(): Ambito {
@@ -193,15 +235,17 @@ export class Ambito {
 
         let env: Ambito | null = this;
 
-        console.log("Estoy guardando la lista: " + id);
+        
 
         if(!env.listas.has(id.toLowerCase())){
+            console.log("Estoy guardando la lista: " + id);
             //Si no lo tiene se guarda
 
             env.listas.set(id.toLowerCase(), new Lista(id, tipo));
 
 
             //luego lo meto a la tabla de simbolos
+            ListaTabla.push( new Tabla_simbolos(id, TipoPrimitivo.Lista, "ambito", line, column))
 
 
         } else {
@@ -221,6 +265,7 @@ export class Ambito {
 
 
             if(env.listas.has(id.toLowerCase())){
+                //console.log("lista encontrada");
 
                 return env.listas.get(id.toLowerCase())!;
 
@@ -234,6 +279,45 @@ export class Ambito {
 
         return null;
 
+
+    }
+
+
+    public guardarvector(id: string, tipo: TipoPrimitivo, size: number, linea:number, columna: number){
+
+        let env: Ambito | null = this;
+        console.log("Estoy guardando el vector: " + id);
+
+        if(!env.vectores.has(id.toLowerCase())){
+
+            env.vectores.set(id.toLowerCase(), new Vector(id, tipo, size));
+
+            ListaTabla.push( new Tabla_simbolos(id, TipoPrimitivo.Vector , "ambito", linea, columna))
+
+        } else {
+            console.log("Error: ya existe el vector: " + id);
+        }
+
+    }
+
+
+    public getVector(id: string): Vector | null {
+
+        let env: Ambito | null = this;
+
+        while(env != null){
+
+            if(env.vectores.has(id.toLowerCase())){
+
+                return env.vectores.get(id.toLowerCase())!;
+
+            }
+
+            env = env.anterior;
+
+        }
+
+        return null;
 
     }
 

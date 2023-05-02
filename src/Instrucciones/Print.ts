@@ -15,7 +15,7 @@ export class Print extends Instruccion {
         //const value = this.expression.Ejecutar(env); //
         //console.log("Se imprime el valor: "+ value);
         printlist.push(value.value);
-        console.log("Desde consola instruccion print: ", value.value);
+        //console.log("Desde consola instruccion print: ", value.value);
         
     }
 }

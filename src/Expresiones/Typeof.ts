@@ -31,8 +31,14 @@ export class Typeof extends Expresion {
         } else if(val.type == TipoPrimitivo.Integer){
             return { value: "entero", type: TipoPrimitivo.String};
         
-        } else {
+        } else if(val.type == TipoPrimitivo.String){
             return { value: "string", type: TipoPrimitivo.String};
+        
+        } else if(val.type == TipoPrimitivo.Lista){
+            return { value: "lista", type: TipoPrimitivo.String};
+        
+        } else {
+            return { value: "vector", type: TipoPrimitivo.String};
         }
         
 
