@@ -23,11 +23,12 @@ export class If extends Instruccion {
             if(condicion.value){
 
                 //this.statementIf es de la clase Statement
-                this.statementIf.Ejecutar(env);
+                console.log("Return: "+this.statementIf.Ejecutar(env));
+                return this.statementIf.Ejecutar(env);
 
             } else {
                 if(this.statementElse != null){
-                    this.statementElse.Ejecutar(env);
+                    return this.statementElse.Ejecutar(env);
                 }
 
             }

@@ -15,10 +15,10 @@ export class LlamadaMetodo extends Instruccion {
         //Buscamos el metodo para ejecutarlo
 
         const metodo = env.getMetodo(this.id);
-
+        
         if(metodo != null){
 
-            const envFun = new Ambito(env.getGlobal());
+            const envFun = new Ambito(env.getGlobal(), this.id);
 
             if(metodo.parametros.length == this.argumentos.length){
 

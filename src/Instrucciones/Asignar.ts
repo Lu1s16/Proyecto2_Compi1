@@ -29,7 +29,7 @@ export class Asignar extends Instruccion {
 
             const val = this.valor.Get(env);
             //console.log("Estoy actualizando el valor: "+ val.value);
-            env.actualizar_var(this.id, val.value, val.type, this.line, this.line);
+            env.actualizar_var(this.id, val.value, val.type);
 
         }
 

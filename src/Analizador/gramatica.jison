@@ -51,8 +51,8 @@
 
 
 /* ======================= EXPRESIONES REGULARES ============================= */
-([a-zA-ZÑñ]|("_"[a-zA-ZÑñ]))([a-zA-ZÑñ]|[0-9]|"_")*                             yytext = yytext.toLowerCase();                  return 'id';
-\"([a-zA-Z]|[0-9]|[!]|[#-&]|[(-/)]|[\:-@]|[\[]|[\]]|[_]|[\|]|\\t|\s)+\"         yytext = yytext.substr(1,yyleng-2);             return 'cadena';
+([a-zA-ZñÑáéíóú]|("_"[a-zA-ZÑñ]))([a-zA-ZÑñ]|[0-9]|"_")*                             yytext = yytext.toLowerCase();                  return 'id';
+\"([a-zA-ZñÑ]|[á-ú]|[0-9]|[!]|[#-&]|[(-/)]|[\:-@]|[\[]|[\]]|[_]|[\|]|\\t|\s|=|\¿|\?)+\"         yytext = yytext.substr(1,yyleng-2);             return 'cadena';
 \'[!-~]\'                                                                       yytext = yytext.substr(1,yyleng-2);             return 'caracter';
 [0-9]+\.[0-9]+                                                                                                                  return 'decimal';
 [0-9]+                                                                                                                          return 'entero';
@@ -132,7 +132,7 @@
         let Length                      =   require("../Expresiones/Length").Length;
         let ToCharArray                 =   require("../Expresiones/ToCharArray").ToCharArray;
         let ReturnExpresion             =   require("../Expresiones/ReturnExpresion").ReturnExpresion;
-        
+        let OperacionesUnarios          =   require("../Expresiones/OperacionesUnarios").OperacionesUnarios;   
 
 
         /*Instrucciones*/
@@ -150,6 +150,7 @@
         let LlamadaMetodo               =   require("../Instrucciones/LlamadaMetodo").LlamadaMetodo;
         let Metodo                      =   require("../Instrucciones/Metodo").Metodo
         let If                          =   require("../Instrucciones/If").If;
+        let For                         =   require("../Instrucciones/For").For;
         let Main                        =   require("../Instrucciones/Main").Main;
 
 %}      
@@ -159,19 +160,24 @@
 /* ================= ASOCIATIVIDAD y PRECEDENCIA DE OPERADORES ===============
 %left '++' '--'
 
-/*Operaciones aritmeticos*/
-%right negacion '('
-%left '^'
-%left '*' '/' '%'
-%left '+' '-'
+
 
 /*Operaciones relacionales*/
 %left '!=' '==' '>' '<' '<=' '>=' 
+
+/*Operaciones aritmeticos*/
+
+%left '^'
+%left '+' '-'
+%left '*' '/' '%'
 
 /*Operaciones logicos*/
 %right '!'
 %left '&&'
 %left '||'
+
+
+%right negacion
 
 
 
@@ -193,7 +199,7 @@ INSTRUCCIONES : INSTRUCCIONES INSTRUCCION { $1.push($2); $$ = $1;}
               | INSTRUCCION { $$ = [$1]; }
 ;
 
-INSTRUCCION : DEC_VAR                   { $$ = $1; }
+INSTRUCCION : DEC_VAR  ';'              { $$ = $1; }
               | ASIG_VAR                { $$ = $1; }
               | DEC_VEC                 { $$ = $1; }
               | MOD_VEC                 { $$ = $1; }
@@ -204,7 +210,7 @@ INSTRUCCION : DEC_VAR                   { $$ = $1; }
               | IF                      { $$ = $1; }
               | SWITCH_CASE
               | WHILE 
-              | FOR
+              | FOR                     { $$ = $1; }
               | DO_WHILE
               | break ';'
               | continue ';'
@@ -221,15 +227,15 @@ INSTRUCCION : DEC_VAR                   { $$ = $1; }
 
 
 /*==================instrucciones=============================*/
-DEC_VAR : TIPO id ';' {  $$ = new Declarar($2, $1, null, @1.first_line, @1.first_column); }
-        | TIPO id '=' EXPRESIONES ';' { $$ = new Declarar($2, $1, $4, @1.first_line, @1.first_column ); }
+DEC_VAR : TIPO id  {  $$ = new Declarar($2, $1, null, @2.first_line, @2.first_column); }
+        | TIPO id '=' EXPRESIONES  { $$ = new Declarar($2, $1, $4, @2.first_line, @2.first_column ); }
 ;
 
 ASIG_VAR : id '=' EXPRESIONES ';' { $$ = new Asignar($1, $3, @1.first_line, @1.first_column); }     
 ;
 
-DEC_VEC : TIPO '[' ']' id '=' new TIPO '[' EXPRESIONES ']' ';' { $$ = new DeclararVector($4, $1, $9, @1.first_line, @1.first_column); }
-        | TIPO '[' ']' id '=' '{' LISTA_VALORES '}' ';' { $$ = new DeclararVector2($4, $1, $7, @1.first_line, @1.first_column); }
+DEC_VEC : TIPO '[' ']' id '=' new TIPO '[' EXPRESIONES ']' ';' { $$ = new DeclararVector($4, $1, $9, @4.first_line, @4.first_column); }
+        | TIPO '[' ']' id '=' '{' LISTA_VALORES '}' ';' { $$ = new DeclararVector2($4, $1, $7, @4.first_line, @4.first_column); }
 ;
 
 LISTA_VALORES : LISTA_VALORES ',' EXPRESIONES { $1.push($3); $$ = $1; }
@@ -240,8 +246,8 @@ MOD_VEC : id '[' EXPRESIONES ']' '=' EXPRESIONES ';'  { $$ = new ModificarVector
 ;
 
 
-DEC_LIST : list '<' TIPO '>' id '=' new list '<' TIPO '>' ';'  { $$ = new DeclararLista($5, $3, @1.first_line, @1.first_column, null); }
-         | list '<' TIPO '>' id '=' TO_CHAR_ARRAY ';'          { $$ = new DeclararLista($5, $3, @1.first_line, @1.first_column, $7); }
+DEC_LIST : list '<' TIPO '>' id '=' new list '<' TIPO '>' ';'  { $$ = new DeclararLista($5, $3, @5.first_line, @5.first_column, null); }
+         | list '<' TIPO '>' id '=' TO_CHAR_ARRAY ';'          { $$ = new DeclararLista($5, $3, @5.first_line, @5.first_column, $7); }
 ;
 
 TO_CHAR_ARRAY : tochararray '(' EXPRESIONES ')'  { $$ = new ToCharArray($3, @1.first_line, @1.first_column); }
@@ -284,14 +290,12 @@ DEFAULT : default ':' INSTRUCCIONES
 WHILE : while '(' EXPRESIONES ')' '{' INSTRUCCIONES '}' 
 ;
 
-FOR : for '(' DECLARACION  EXPRESIONES ';' ACTUALIZACION ')' STATEMENT { console.log("Se inicializo un for con declaracion: " + $3 + " expresion: " + $5 + " y actualizcion: " + $7); }
+FOR : for '(' DEC_VAR ';'  EXPRESIONES ';' ACTUALIZACION ')' STATEMENT  { $$ = new For($3, $5, $7, $9, @1.first_line, @1.first_column); }
 ;
 
-DECLARACION : DEC_VAR
-            | ASIG_VAR
-;
 
-ACTUALIZACION : EXPRESIONES '++'
+
+ACTUALIZACION : id '++'        { $$ = new OperacionesUnarios($1, $2, @1.first_line, @1.first_column); }
               | EXPRESIONES '--'
               | ASIG_VAR
 ;
@@ -305,12 +309,12 @@ RETURN : return ';'               { $$ = new ReturnExpresion(null, @1.first_line
 
 /*===================FUNCIONES Y METODOS=======================*/
 
-FUNCIONES : TIPO id '(' PARAMETROS ')'  STATEMENT { $$ = new Funcion($1, $2, $4, $6, @1.first_line, @1.first_column)}
-        | TIPO id '(' ')'  STATEMENT              { $$ = new Funcion($1, $2, [], $5, @1.first_line, @1.first_column)}
+FUNCIONES : TIPO id '(' PARAMETROS ')'  STATEMENT { $$ = new Funcion($1, $2, $4, $6, @2.first_line, @2.first_column)}
+        | TIPO id '(' ')'  STATEMENT              { $$ = new Funcion($1, $2, [], $5, @2.first_line, @2.first_column)}
 ;
 
-METODOS : void id '(' PARAMETROS ')' STATEMENT { $$ = new Metodo($2, $4, $6, @1.first_line, @1.first_column); }
-        | void id '(' ')'  STATEMENT           { $$ = new Metodo($2, [], $5, @1.first_line, @1.first_column); } 
+METODOS : void id '(' PARAMETROS ')' STATEMENT { $$ = new Metodo($2, $4, $6, @2.first_line, @2.first_column); }
+        | void id '(' ')'  STATEMENT           { $$ = new Metodo($2, [], $5, @2.first_line, @2.first_column); } 
 ;
 
 STATEMENT: '{' INSTRUCCIONES '}' { $$ = new Statement($2, @1.first_line, @1.first_column) }
@@ -442,7 +446,7 @@ ARITMETICAS : EXPRESIONES '+' EXPRESIONES       {  $$ = new OperacionAritmetica(
             | EXPRESIONES '/' EXPRESIONES       {  $$ = new OperacionAritmetica($1, $2, $3, @1.first_line, @2.first_column); } 
             | EXPRESIONES '^' EXPRESIONES       {  $$ = new OperacionAritmetica($1, $2, $3, @1.first_line, @2.first_column); } 
             | EXPRESIONES '%' EXPRESIONES       {  $$ = new OperacionAritmetica($1, $2, $3, @1.first_line, @2.first_column); } 
-            | '-' EXPRESIONES %prec negacion    
+            | '-' EXPRESIONES %prec negacion    {  $$ = new OperacionAritmetica(null, $1, $2, @1.first_line, @2.first_column); }   
 ;
 
 RELACIONALES : EXPRESIONES '==' EXPRESIONES     {  $$  = new Relacional($1, $2, $3, @1.first_line, @1.first_column); }

@@ -14,10 +14,12 @@ export class Statement extends Instruccion {
     public Ejecutar(env: Ambito) {
         
         //Crea un nuevo ambito
-        const newEnv = new Ambito(env);
+        const newEnv = new Ambito(env, "nuevo_ambito");
 
         //body contienen todas las instrucciones de la funcion
         for(const instrucciones of this.body) {
+
+           
 
             //console.log("Instruccion: "+instrucciones.Ejecutar(newEnv));
 
@@ -35,19 +37,18 @@ export class Statement extends Instruccion {
                     }
                     
                 } else {
-                    const ret = instrucciones.Ejecutar(newEnv);
+                    instrucciones.Ejecutar(newEnv);
                     //console.log("Ret: "+ret);
 
-                    if(ret != null && ret != undefined){
-                        return ret;
-                    }
+                
 
                 }
 
                 
 
             }catch(e){
-                console.log("Error, al ejecutar instrucciones")
+                //console.error(e);
+                console.log("Error, al ejecutar instrucciones: ")
             }
 
         }

@@ -16,11 +16,13 @@ export class Ambito {
     private listas = new Map<string, Lista>();
     private vectores = new Map<string, Vector>();
     private metodos = new Map<string, Metodo>();
+  
 
     //tendra un ambito
-    constructor(private anterior: Ambito | null){
+    constructor(private anterior: Ambito | null, private name: string){
         //Nuevo map para variables
         this.variables = new Map<string, Variable>();
+        
         
         
 
@@ -45,10 +47,13 @@ export class Ambito {
 
             //en el push se esta metiendo un objeto de tabla_simbolo
             //Esta es mi tabla de simbolos
-            ListaTabla.push( new Tabla_simbolos(id, tipo, "ambito" , linea, columna))
+            ListaTabla.push( new Tabla_simbolos(id, tipo, this.name , linea, columna))
 
 
         } else {
+            console.log("Elimino variable")
+
+            env.variables.delete(id.toLowerCase());
 
             console.log("Error: ya existe la variable")
         }
@@ -70,7 +75,7 @@ export class Ambito {
             //Guarda la variable en una tabla de simbolos
             env.variables.set(id.toLowerCase(), new Variable(valor, id, tipo));
 
-            ListaTabla.push( new Tabla_simbolos(id, tipo, "ambito", linea, columna))
+            ListaTabla.push( new Tabla_simbolos(id, tipo, this.name, linea, columna))
 
 
         } else {
@@ -81,27 +86,29 @@ export class Ambito {
     }
 
     //asignar nuevo valor a una variable
-    public actualizar_var(id: string, valor: any, tipo: TipoPrimitivo, linea: number, columna:number ){
+    public actualizar_var(id: string, valor: any, tipo: TipoPrimitivo){
 
         //Verificar el ambito
         let env: Ambito | null = this;
 
-        //Verificar que exista la variable
-        console.log("Estoy actualizando la variable: " + id);
-        if(!env.variables.has(id.toLowerCase())){
-            //Si aun no existe se guarda la variable
+        while(env != null){
 
-  
-            env.variables.set(id.toLowerCase(), new Variable(valor, id, tipo));
+            if(env.variables.has(id.toLowerCase())){
 
-        } else {
-            //si ya existe se actualiza su valor
-            env.variables.set(id.toLowerCase(), new Variable(valor, id, tipo));
+                env.variables.get(id.toLowerCase())!.valor = valor;
+                return;
 
-            //console.log("Error: ya existe la variable declarada")
+            }
+
+            env = env.anterior;
+
         }
 
+        
+
     }
+
+   
 
 
 
@@ -144,7 +151,7 @@ export class Ambito {
             console.log("Se guardo la funcion: "+ id);
             env.funciones.set(id.toLowerCase(), funcion);
 
-            ListaTabla.push( new Tabla_simbolos(id, TipoPrimitivo.Funcion, "ambito", line, column))
+            ListaTabla.push( new Tabla_simbolos(id, TipoPrimitivo.Funcion, this.name, line, column))
 
         } else {
 
@@ -177,6 +184,7 @@ export class Ambito {
 
     }
 
+    //Guara metodos
     public guardarMetodo(id: string, metodo: Metodo, line: number, column: number){
 
         //verificar ambito
@@ -186,6 +194,8 @@ export class Ambito {
 
             console.log("Se guardo el metodo: "+ id);
             env.metodos.set(id.toLocaleLowerCase(), metodo)
+
+            ListaTabla.push( new Tabla_simbolos(id, TipoPrimitivo.Metodo, this.name, line, column))
 
 
         } else {
@@ -245,7 +255,7 @@ export class Ambito {
 
 
             //luego lo meto a la tabla de simbolos
-            ListaTabla.push( new Tabla_simbolos(id, TipoPrimitivo.Lista, "ambito", line, column))
+            ListaTabla.push( new Tabla_simbolos(id, TipoPrimitivo.Lista, this.name, line, column))
 
 
         } else {
@@ -292,7 +302,7 @@ export class Ambito {
 
             env.vectores.set(id.toLowerCase(), new Vector(id, tipo, size));
 
-            ListaTabla.push( new Tabla_simbolos(id, TipoPrimitivo.Vector , "ambito", linea, columna))
+            ListaTabla.push( new Tabla_simbolos(id, TipoPrimitivo.Vector , this.name, linea, columna))
 
         } else {
             console.log("Error: ya existe el vector: " + id);

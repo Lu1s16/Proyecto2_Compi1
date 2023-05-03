@@ -1,12 +1,12 @@
 //import Parser from "./gramatica";
-import { printlist } from "../Reportes/PrintList";
 import { Ambito } from "../Entorno/Ambito";
 import { Declarar } from "../Instrucciones/Declarar";
 import { Funcion } from "../Instrucciones/Funcion";
 import { Metodo } from "../Instrucciones/Metodo";
 import { Main } from "../Instrucciones/Main";
+import { ListaTabla } from "../Reportes/Tabla_simbolos";
 
-export class Analizador{
+export class Reporte{
 
     entrada: string;
     archivo: string;
@@ -29,7 +29,8 @@ export class Analizador{
             const ast = parser.parse(this.entrada);
 
             try{
-                printlist.splice(0, printlist.length);
+                ListaTabla.splice(0, ListaTabla.length);
+                
 
                 const globalEnv = new Ambito(null, "Global");
 
@@ -51,7 +52,7 @@ export class Analizador{
                     }
                 }
 
-                return printlist.join("\n");
+                return ListaTabla;
 
 
 

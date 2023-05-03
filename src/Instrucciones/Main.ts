@@ -17,7 +17,7 @@ export class Main extends Instruccion {
 
         if(funcion != null){
             //significa que si existe y se crea un nuevo entorno
-            const envFun = new Ambito(env.getGlobal());
+            const envFun = new Ambito(env.getGlobal(), this.id);
 
             //guardo los parametros y verifico que si vengan todos
             if(funcion.parametros.length == this.argumentos.length){
@@ -57,7 +57,7 @@ export class Main extends Instruccion {
 
         } else if (metodo != null) {
 
-            const envFun = new Ambito(env.getGlobal());
+            const envFun = new Ambito(env.getGlobal(), this.id);
 
             if(metodo.parametros.length == this.argumentos.length){
 

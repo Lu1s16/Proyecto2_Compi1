@@ -9,5 +9,6 @@ export enum TipoPrimitivo {
     Lista = 7,
     Vector = 8,
     Funcion = 9,
-    undefined = 10
+    undefined = 10,
+    Metodo = 11
 }

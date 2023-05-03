@@ -17,7 +17,7 @@ export class LlamadaFuncion extends Expresion {
         
         if(funcion != null){
             //significa que si existe y se crea un nuevo entorno
-            const envFun = new Ambito(env.getGlobal());
+            const envFun = new Ambito(env.getGlobal(), this.id);
 
             //guardo los parametros y verifico que si vengan todos
             if(funcion.parametros.length == this.argumentos.length){
@@ -29,18 +29,22 @@ export class LlamadaFuncion extends Expresion {
                     const valor = this.argumentos[i].Get(env);
                     const param = funcion.parametros[i].Get(env);
 
+                    if(valor){
+                        //verifico el tipo que si coincida
+                        if (valor.type == param.type) {
+                        
+                            //Guarda los valores pero en el ambito funcion
+                            //console.log("guardar variables de ambito funcion")
+                            envFun.guardar(param.value, valor.value, valor.type, this.linea, this.columna);
+                        
+                        
+                        } else {
+                            console.log("Error: el parametro " + param.value + "no coincide su tipo con el que neceista la funcion")
+                        }
 
-                    //verifico el tipo que si coincida
-                    if (valor.type == param.type) {
-
-                        //Guarda los valores pero en el ambito funcion
-                        //console.log("guardar variables de ambito funcion")
-                        envFun.guardar(param.value, valor.value, valor.type, this.linea, this.columna);
-
-
-                    } else {
-                        console.log("Error: el parametro " + param.value + "no coincide su tipo con el que neceista la funcion")
                     }
+
+                    
 
                 }
 

@@ -25,7 +25,7 @@ export class Declarar extends Instruccion {
 
             //console.log("Se guardo la variable: "+ this.id)
             //Accede a la clase Primitivo para obtener el valor del id.
-            console.log("Declaracion de : " + this.id);
+            console.log("Declaracion de variable: " + this.id);
             
             const val = this.valor.Get(env);
 
@@ -41,11 +41,14 @@ export class Declarar extends Instruccion {
             // guardar la variable con su valor por defecto
             //de la forma int a;
             
+            
             const val = this.default()
 
             env.guardar_default(this.id, val, this.tipo, this.line, this.column);
             
         }
+
+      
         
     }
 

@@ -8,7 +8,7 @@ import { Return } from "../Entorno/Simbolos/Return";
 export class OperacionAritmetica extends Expresion {
 
 
-    constructor(private exp1: Expresion, private operador: any, private exp2: Expresion, line: number, column: number){
+    constructor(private exp1: Expresion|null, private operador: any, private exp2: Expresion, line: number, column: number){
         super(line, column);
 
        
@@ -18,19 +18,26 @@ export class OperacionAritmetica extends Expresion {
 
     public Get(env: Ambito): Return {
 
-        
-        //--------SUMA------
-        if(this.operador == "+"){
+        if(this.exp1 != null){
+
+
+            //--------SUMA------
+            if(this.operador == "+"){
 
             //console.log("suma");
 
             //obtengo el valor
+        
             const op1 = this.exp1.Get(env);
             const op2 = this.exp2.Get(env);
+            //console.log("operacion de funcion: "+op2.type);
 
             //obtengo el tipo dominante
+            //console.log("op1: "+op1.type);
+            //console.log("op2: "+op2.type);
             const tipoDominante = TablaSuma[op1.type][op2.type];
-
+            //console.log("dominante: "+tipoDominante)
+            //console.log("============="+ tipoDominante);
             //Verificar el tipo de dato
             switch(tipoDominante){
                 case TipoPrimitivo.Integer:
@@ -98,6 +105,7 @@ export class OperacionAritmetica extends Expresion {
 
 
                 case TipoPrimitivo.String:
+                    //console.log("Dominante string")
 
                     //Operaciones que devuelvan un string
                     //verificar si algun operando es int
@@ -151,15 +159,19 @@ export class OperacionAritmetica extends Expresion {
             }
 
 
-        //------RESTA-------
-        } else if (this.operador == "-"){
+            //------RESTA-------
+            } else if (this.operador == "-"){
 
             const op1 = this.exp1.Get(env);
             const op2 = this.exp2.Get(env);
 
+            console.log("op1: "+op1.type);
+            console.log("op1: "+op2.type);
+            
+
             const tipoDominante = TablaResta[op1.type][op2.type];
 
-            console.log("resta");
+            //console.log("resta");
 
             switch(tipoDominante){
 
@@ -232,11 +244,12 @@ export class OperacionAritmetica extends Expresion {
 
 
 
-        //-------MULTIPLICACION--------
-        } else if (this.operador == "*"){
+            //-------MULTIPLICACION--------
+            } else if (this.operador == "*"){
 
             const op1 = this.exp1.Get(env);
             const op2 = this.exp2.Get(env);
+            
 
             //obtengo el tipo dominante
             const tipoDominante = TablaMultiplicacion[op1.type][op2.type];
@@ -289,7 +302,7 @@ export class OperacionAritmetica extends Expresion {
 
 
 
-        } else if(this.operador == "/"){
+            } else if(this.operador == "/"){
 
             console.log("Division");
 
@@ -329,7 +342,7 @@ export class OperacionAritmetica extends Expresion {
             }
 
 
-        } else if (this.operador == "^"){
+            } else if (this.operador == "^"){
 
             console.log("Potencia");
 
@@ -366,7 +379,7 @@ export class OperacionAritmetica extends Expresion {
             }
 
 
-        } else if (this.operador == "%"){
+            } else if (this.operador == "%"){
 
             console.log("Modulo");
 
@@ -394,10 +407,40 @@ export class OperacionAritmetica extends Expresion {
 
             }
 
+            }
+            console.log("Error: operacion aritmetica no valida")
+
+            return {value: null, type: TipoPrimitivo.Null};
+        
+
+
+
+
+
+
+        } else {
+
+            if(this.operador == "-"){
+
+                const op2 = this.exp2.Get(env);
+
+                if(op2.type == TipoPrimitivo.Double){
+                    return {value: -op2.value, type: TipoPrimitivo.Double};
+
+                } else if (op2.type == TipoPrimitivo.Integer){
+                    return {value: -op2.value, type: TipoPrimitivo.Integer};
+                }
+
+
+                
+
+            }
+
         }
-        console.log("Erro: operacion aritmetica no valida")
 
         return {value: null, type: TipoPrimitivo.Null};
+
+        
         
         
 

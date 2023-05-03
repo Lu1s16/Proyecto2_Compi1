@@ -2,20 +2,125 @@
     <head>
         <title><%= titulo %></title>
 
+        <!-- =================================== IMPORTACIONES =============================== -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    
+
+        <!-- ================================= CODEMIRROR =========================== -->
+    <link rel="stylesheet" href="/codemirror/lib/codemirror.css">
+    <script src="/codemirror/lib/codemirror.js"></script>
+
+     <script src="/codemirror/lib/codemirror.js"></script>
+     <script src="/codemirror/mode/clike/clike.js"></script>
+     <link rel="stylesheet" href="/codemirror/lib/codemirror.css"/>
+     <script src="/codemirror/mode/javascript/javascript.js"></script>              <!-- MODO   -->
+     <link href="/codemirror/theme/midnight.css" rel="stylesheet" />       <!-- TEMA   -->
+     <!-- CODEMIRROR ADDONS -->
+     <script src="/codemirror/addon/edit/closebrackets.js"></script>      
+     <script src="/codemirror/addon/selection/active-line.js"></script>
+
     </head>
     <body>
+
+        
 
         <h2>Editor</h2>
         
         <form action="/ejecutar" method="POST">
-            <textarea name="codigo"><%= codigo %></textarea>
+            <textarea id="editor"  name="codigo"><%= codigo %></textarea>
+            <input type="checkbox" name="tabla">Tabla Simbolos
             <input type="submit" value="Ejectuar">
         </form>
 
-        <h2>Consola</h2>
+
+        <input type="file" id="file-selector">
+        
+
+        <div id="contenedor">
+            <h2>Consola</h2>
+            <textarea name="consola" id="respuesta"><%= consola %></textarea>
+
+        </div>
+
+        
+        
 
 
-        <textarea name="consola"><%= consola %></textarea>
+        <script>
+
+            //document.getElementById("reporte").innerHTML = tabla_simbolos; 
+
+            let editor = CodeMirror.fromTextArea(document.getElementById("editor"),{
+                        lineNumbers         : true,
+                        mode                : "text/x-java",
+                        theme               : "midnight",
+                        autoCloseBrackets   : true,
+                        //lineWrapping : true,
+                        //scrollbarStyle:  "simple",
+                        styleActiveLine     : true
+                    });
+            editor.setSize("630","600");
+            
+
+            let respuesta = CodeMirror.fromTextArea(document.getElementById("respuesta"),{
+                        lineNumbers         : true,
+                        mode                : "text/x-java",
+                        theme               : "midnight",
+                        autoCloseBrackets   : true,
+                        //lineWrapping : true,
+                        styleActiveLine     : true
+                    });
+            respuesta.setSize("630","600");
+
+            let input = document.getElementById("file-selector")
+            
+
+            input.addEventListener("change", () =>{
+                let archivos = input.files;
+                if(archivos.length == 0){
+                    return;
+                }
+
+                let archivo = archivos[0];
+
+                let contenido = new FileReader()
+
+                contenido.onload = (e) =>{
+                    let archivo = e.target.result;
+                    //separa texto por salto de linea
+                    let lineas = archivo.split(/\r\n|\n/)
+                    //editor.value = lineas.join("\n");
+                    inserText(lineas.join("\n"));
+                    
+                    
+
+                };
+                //mostrar error
+                contenido.onerror = (e) => alert(e.target.error.name)
+                contenido.readAsText(archivo);
+
+            })
+
+            function inserText(data) {
+                var cm = $(".CodeMirror")[0].CodeMirror;
+                var doc = cm.getDoc();
+                var cursor = doc.getCursor();
+                var line = doc.getLine(cursor.line);
+                var pos = {
+                    line: cursor.line
+                };
+
+                if(line.length === 0){
+                    doc.replaceRange(data, pos);
+                } else {
+                    doc.replaceRange("\n"+ data, pos);
+                }
+
+            }
+
+            
+        </script>
     </body>
 
 </html>

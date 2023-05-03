@@ -17,7 +17,14 @@ export class ReturnExpresion extends Expresion {
         
         if(this.value != null && this.value != undefined){
             const value = this.value.Get(env);
-            return { value: value.value, type: TipoPrimitivo.Return};
+
+            if(value != null && value != undefined){
+
+                return { value: value.value, type: value.type};
+
+            }
+
+            
         }
 
         return { value: null, type: TipoPrimitivo.Null};

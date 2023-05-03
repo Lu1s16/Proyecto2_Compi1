@@ -1,10 +1,10 @@
 import { TipoPrimitivo } from "../Entorno/Simbolos/TipoPrimitivo"
 
 export const TablaSuma = [
-    [TipoPrimitivo.Integer, TipoPrimitivo.Double, TipoPrimitivo.Integer, TipoPrimitivo.Integer, TipoPrimitivo.Char],
+    [TipoPrimitivo.Integer, TipoPrimitivo.Double, TipoPrimitivo.Integer, TipoPrimitivo.Integer, TipoPrimitivo.String],
     [TipoPrimitivo.Double,  TipoPrimitivo.Double, TipoPrimitivo.Double,  TipoPrimitivo.Double,  TipoPrimitivo.String],
     [TipoPrimitivo.Integer, TipoPrimitivo.Double, TipoPrimitivo.Null,    TipoPrimitivo.Null,    TipoPrimitivo.String],
-    [TipoPrimitivo.Integer, TipoPrimitivo.Double, TipoPrimitivo.Null,    TipoPrimitivo.String,  TipoPrimitivo.Char],
+    [TipoPrimitivo.Integer, TipoPrimitivo.Double, TipoPrimitivo.Null,    TipoPrimitivo.String,  TipoPrimitivo.String],
     [TipoPrimitivo.String,  TipoPrimitivo.String, TipoPrimitivo.String,  TipoPrimitivo.String,  TipoPrimitivo.String]
 ]
 
