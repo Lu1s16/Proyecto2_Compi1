@@ -1,0 +1,417 @@
+
+
+/* Definicion lexica */
+%lex
+
+%options case-insensitive
+
+%%
+\s+                    {/* skip whitespace */}
+
+
+/* ========================= COMENTARIOS ============================== */
+"//".*                                 {/* IGNORE */}
+\/\*([^*]|\*(?!\/))*\*\/    {/* IGNORE */}
+
+
+/* =========================== PALABRAS RESERVADAS ========================== */
+/*Tipos de datos*/
+"int"                                           { return 'pint'; }
+"double"                                        { return 'pdouble'; }
+"boolean"                                       { return 'pboolean'; }
+"char"                                          { return 'pchar'; }
+"string"                                        { return 'pstring'; }
+"true"                                          { return 'ptrue'; }
+"false"                                         { return 'pfalse'; }
+"new"                                           { return 'new'; }
+"list"                                          { return 'list'; }
+"add"                                           { return 'add'; }
+"if"                                            { return 'if'; }
+"else"                                          { return 'else'; }
+"switch"                                        { return 'switch'; }
+"case"                                          { return 'case'; }
+"default"                                       { return 'default';}
+"break"                                         { return 'break';}
+"continue"                                      { return 'continue';}
+"return"                                        { return 'return';}
+"while"                                         { return 'while';}
+"for"                                           { return 'for';}
+"do"                                            { return 'do';}
+"void"                                          { return 'void';}
+"print"                                         { return 'print';}
+"toLower"                                       { return 'toLower';}
+"toUpper"                                       { return 'toUpper';}
+"length"                                        { return 'length';}
+"truncate"                                      { return 'truncate';}
+"round"                                         { return 'round';}
+"typeof"                                        { return 'typeof';}
+"tostring"                                      { return 'tostring';}
+"tochararray"                                   { return 'tochararray';}
+"main"                                          { return 'main';}
+
+
+/* ======================= EXPRESIONES REGULARES ============================= */
+([a-zA-ZñÑáéíóú]|("_"[a-zA-ZÑñ]))([a-zA-ZÑñ]|[0-9]|"_")*                                        yytext = yytext.toLowerCase();                  return 'id';
+\"([a-zA-ZñÑ]|[á-ú]|[0-9]|[!]|[#-&]|[(-/)]|[\:-@]|[\[]|[\]]|[_]|[\|]|\\t|\s|=|\¿|\?)+\"         yytext = yytext.substr(1,yyleng-2);             return 'cadena';
+\'[!-~]\'                                                                                       yytext = yytext.substr(1,yyleng-2);             return 'caracter';
+[0-9]+\.[0-9]+                                                                                                                                  return 'decimal';
+[0-9]+                                                                                                                                          return 'entero';
+
+
+
+/* ============================== SIGNOS ===================================== */
+"++"                                            { return '++'; }
+"--"                                            { return '--'; }
+
+/*Operadores aritmeticos*/
+"+"                                             { return '+'; }
+"-"                                             { return '-'; }
+"*"                                             { return '*'; }
+"/"                                             { return '/'; }
+"^"                                             { return '^'; }
+"%"                                             { return '%'; }
+
+/*Operadores relacionales*/
+"=="                                            { return '=='; }
+"!="                                            { return '!='; }
+"<="                                            { return '<='; }
+"<"                                             { return '<'; }
+">="                                            { return '>='; }
+">"                                             { return '>'; }
+
+/*Operador ternario*/
+"?"                                             { return '?'; }
+":"                                             { return ':'; }
+
+/*operadores logicos*/
+"||"                                            { return '||'; }
+"&&"                                            { return '&&'; }
+"!"                                             { return '!'; }
+
+/*signos de agrupacion*/
+"("                                             { return '('; }
+")"                                             { return ')'; }              
+";"                                             { return ';'; }
+"{"                                             { return '{'; }
+"}"                                             { return '}'; }
+"["                                             { return '['; }
+"]"                                             { return ']'; }
+"="                                             { return '='; }
+","                                             { return ','; }
+"."                                             { return '.'; }
+
+
+
+
+<<EOF>>                 return 'EOF';
+.       { console.error('Este es un error léxico: ' + yytext + ', en la linea: ' + yylloc.first_line + ', en la columna: ' + yylloc.first_column); }
+/lex    
+
+
+
+/* ================= ASOCIATIVIDAD y PRECEDENCIA DE OPERADORES ===============
+%left '++' '--'
+
+
+
+/*Operaciones relacionales*/
+%left '!=' '==' '>' '<' '<=' '>=' 
+
+/*Operaciones aritmeticos*/
+
+%left '^'
+%left '+' '-'
+%left '*' '/' '%'
+
+/*Operaciones logicos*/
+%right '!'
+%left '&&'
+%left '||'
+
+
+%right negacion
+
+
+
+
+
+
+%start INI
+
+%% /* lenguaje grammar */
+
+INI : SENTENCIAS  EOF 
+
+SENTENCIAS : INSTRUCCIONES
+;
+
+
+
+INSTRUCCIONES : INSTRUCCIONES INSTRUCCION
+              | INSTRUCCION
+;
+
+INSTRUCCION : DEC_VAR  ';'             
+              | ASIG_VAR                
+              | DEC_VEC                 
+              | MOD_VEC                 
+              | DEC_LIST                
+              | ADD_LIST                
+              | MOD_LIST                
+              | LLAMADA_METODO          
+              | IF                      
+              | SWITCH_CASE
+              | WHILE 
+              | FOR                     
+              | DO_WHILE
+              | break ';'
+              | continue ';'
+              | RETURN                  
+              | EXPRESIONES '++' ';'
+              | EXPRESIONES '--' ';'
+              | METODOS
+              | FUNCIONES               
+              | LLAMADA ';'             
+              | PRINT                   
+              | MAIN ';'                
+
+;
+
+
+/*==================instrucciones=============================*/
+DEC_VAR : TIPO id  
+        | TIPO id '=' EXPRESIONES  
+;
+
+ASIG_VAR : id '=' EXPRESIONES ';'    
+;
+
+DEC_VEC : TIPO '[' ']' id '=' new TIPO '[' EXPRESIONES ']' ';' 
+        | TIPO '[' ']' id '=' '{' LISTA_VALORES '}' ';' 
+;
+
+LISTA_VALORES : LISTA_VALORES ',' EXPRESIONES 
+              | EXPRESIONES 
+;
+
+MOD_VEC : id '[' EXPRESIONES ']' '=' EXPRESIONES ';'  
+;
+
+
+DEC_LIST : list '<' TIPO '>' id '=' new list '<' TIPO '>' ';'  
+         | list '<' TIPO '>' id '=' TO_CHAR_ARRAY ';'          
+;
+
+TO_CHAR_ARRAY : tochararray '(' EXPRESIONES ')'  
+; 
+
+ADD_LIST : id '.' add '(' EXPRESIONES ')' ';' 
+;
+
+MOD_LIST : id '[' '[' EXPRESIONES ']' ']'  '=' EXPRESIONES ';' 
+;
+
+
+
+
+
+/*=======================SENTENCIAS===============================*/
+
+IF : if '(' EXPRESIONES ')' STATEMENT ELSE 
+;
+
+ELSE : else STATEMENT   
+     | else IF         
+     |                  
+;
+
+
+
+SWITCH_CASE : switch '(' EXPRESIONES ')' '{' CASE_LIST DEFAULT '}'
+             | switch '(' EXPRESIONES ')' '{' CASE_LIST '}'
+             | switch '(' EXPRESIONES ')' '{' DEFAULT '}'
+;
+
+CASE_LIST : CASE_LIST case EXPRESIONES ':' INSTRUCCIONES
+          | case EXPRESIONES ':' INSTRUCCIONES
+;
+
+DEFAULT : default ':' INSTRUCCIONES
+;
+
+WHILE : while '(' EXPRESIONES ')' '{' INSTRUCCIONES '}' 
+;
+
+FOR : for '(' DEC_VAR ';'  EXPRESIONES ';' ACTUALIZACION ')' STATEMENT
+;
+
+
+
+ACTUALIZACION : id '++'        
+              | EXPRESIONES '--'
+              | ASIG_VAR
+;
+
+DO_WHILE : do '{' INSTRUCCIONES '}' while '(' EXPRESIONES ')' ';'
+;
+
+RETURN : return ';'                    
+       | return EXPRESIONES ';'  
+;
+
+/*===================FUNCIONES Y METODOS=======================*/
+
+FUNCIONES : TIPO id '(' PARAMETROS ')'  STATEMENT 
+        | TIPO id '(' ')'  STATEMENT             
+;
+
+METODOS : void id '(' PARAMETROS ')' STATEMENT 
+        | void id '(' ')'  STATEMENT       
+;
+
+STATEMENT: '{' INSTRUCCIONES '}'
+;
+
+
+PARAMETROS : PARAMETROS ',' PARAMETRO  
+           | PARAMETRO                 
+;
+
+PARAMETRO : TIPO id
+;
+
+
+
+/*Para funciones*/
+LLAMADA_FUNCION : id '(' PARAMETROS_LLAMADA ')'
+        | id '(' ')'            
+;
+
+/*Para metodos*/
+LLAMADA_METODO : id '(' PARAMETROS_LLAMADA ')' ';'
+        | id '(' ')' ';'           
+;
+
+
+PARAMETROS_LLAMADA : PARAMETROS_LLAMADA ',' EXPRESIONES 
+                   | EXPRESIONES 
+;
+
+
+
+
+/* ========================FUNCIONES=============================== */
+
+PRINT : print '(' EXPRESIONES ')' ';'
+;
+
+
+
+
+TO_LOWER : toLower '(' EXPRESIONES ')'
+;
+
+TO_UPPER : toUpper '(' EXPRESIONES ')' 
+;
+
+LENGTH : length '(' EXP_LENGT ')' 
+;
+
+EXP_LENGT : id                                  
+          | cadena                             
+          | id '[' EXPRESIONES ']'             
+          | id '[' '[' EXPRESIONES ']' ']'  
+;
+
+TRUNCATE : truncate '(' EXPRESIONES ')' 
+;
+
+ROUND : round '(' EXPRESIONES ')'
+;
+
+TYPE_OF : typeof '(' EXPRESIONES ')' 
+;
+
+TO_STRING : tostring '(' EXPRESIONES ')' 
+;
+
+CASTEO : '(' TIPO ')' EXPRESIONES 
+;
+
+MAIN : main id '(' ')'                         
+     | main id '(' PARAMETROS_LLAMADA ')'     
+;
+
+
+/*==================== expresiones ==========================*/
+OP_TERNARIO : EXPRESIONES '?' EXPRESIONES ':' EXPRESIONES
+;
+
+
+
+ACC_VEC : id '[' EXPRESIONES ']' 
+;
+
+ACC_LIST: id '[' '[' EXPRESIONES ']' ']'
+;
+
+
+
+
+
+EXPRESIONES : ARITMETICAS               
+            | '(' EXPRESIONES ')'     
+            | RELACIONALES            
+            | LOGICOS                   
+            | ACC_LIST                
+            | ACC_VEC                
+            | LENGTH                  
+            | LLAMADA_FUNCION          
+            | CASTEO             
+            | TO_UPPER                
+            | TO_LOWER               
+            | TO_STRING              
+            | TYPE_OF                   
+            | ROUND                     
+            | TRUNCATE                
+            | OP_TERNARIO              
+            | id                       
+            | PRIMITIVOS                    
+;
+
+LOGICOS : EXPRESIONES '&&' EXPRESIONES  
+        | EXPRESIONES '||' EXPRESIONES 
+        | '!' EXPRESIONES               
+;
+
+PRIMITIVOS : entero          
+            | decimal        
+            | caracter        
+            | cadena          
+            | pfalse          
+            | ptrue           
+;
+
+ARITMETICAS : EXPRESIONES '+' EXPRESIONES        
+            | EXPRESIONES '-' EXPRESIONES       
+            | EXPRESIONES '*' EXPRESIONES        
+            | EXPRESIONES '/' EXPRESIONES       
+            | EXPRESIONES '^' EXPRESIONES      
+            | EXPRESIONES '%' EXPRESIONES        
+            | '-' EXPRESIONES %prec negacion      
+;
+
+RELACIONALES : EXPRESIONES '==' EXPRESIONES     
+            | EXPRESIONES  '!=' EXPRESIONES      
+            | EXPRESIONES  '<'  EXPRESIONES       
+            | EXPRESIONES  '>'  EXPRESIONES       
+            | EXPRESIONES  '<=' EXPRESIONES     
+            | EXPRESIONES  '>=' EXPRESIONES     
+;
+
+TIPO : pint               
+     | pdouble       
+     | pboolean        
+     | pchar               
+     | pstring          
+;
