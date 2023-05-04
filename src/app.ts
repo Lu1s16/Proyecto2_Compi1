@@ -18,13 +18,7 @@ app.get("/", (req, res) =>{
 
 })
 
-app.get("/reporte", (req, res) => {
-    let texto = req.body.codigo;
 
-
-
-    res.send(texto);
-})
 
 app.post("/ejecutar", (req, res) => {
     let texto = req.body.codigo;

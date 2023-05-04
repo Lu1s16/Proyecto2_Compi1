@@ -16,7 +16,8 @@ export class Truncate extends Expresion {
         const val = this.exp.Get(env);
 
 
-        if(val.type == TipoPrimitivo.Double || val.type == TipoPrimitivo.Integer){
+        if(val.type == TipoPrimitivo.Double || 
+            val.type == TipoPrimitivo.Integer){
 
             return { value: Math.trunc(val.value), type: TipoPrimitivo.Integer};
 

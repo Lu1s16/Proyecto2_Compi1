@@ -34,9 +34,6 @@ export class DeclararLista extends Instruccion {
             lista.declarar2(this.cadena, env);
 
 
-
-
-
         } else {
 
             console.log("Declaracion de listaa: " + this.id);

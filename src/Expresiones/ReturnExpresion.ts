@@ -2,7 +2,6 @@ import { Expresion } from "../Entorno/Expresion";
 import { Return } from "../Entorno/Simbolos/Return";
 import { Ambito } from "../Entorno/Ambito";
 import { TipoPrimitivo } from "../Entorno/Simbolos/TipoPrimitivo";
-import { Instruccion } from "../Entorno/Instruccion";
 
 //para la instruccion return
 
@@ -18,11 +17,9 @@ export class ReturnExpresion extends Expresion {
         if(this.value != null && this.value != undefined){
             const value = this.value.Get(env);
 
-            if(value != null && value != undefined){
+            return { value: value.value, type: value.type};
 
-                return { value: value.value, type: value.type};
-
-            }
+            
 
             
         }

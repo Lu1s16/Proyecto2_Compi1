@@ -15,7 +15,7 @@ export class OperacionesUnarios extends Expresion {
         
         if(this.tipoOperacion == "++") {
 
-            console.log()
+            //console.log()
             //obtneer valor de variable
             const valor = env.getVar(this.id);
 
@@ -33,6 +33,26 @@ export class OperacionesUnarios extends Expresion {
 
                 }
             }
+        } else if (this.tipoOperacion == "--") {
+            //console.log()
+            //obtneer valor de variable
+            const valor = env.getVar(this.id);
+
+            //Verificar que exista
+            if(valor) {
+                //Verificar que sea entero
+                if(valor.type == TipoPrimitivo.Integer){
+                    //incrementar el valor
+                    valor.valor = valor.valor -1;
+                    //actualizar el valor de la variable
+                    env.actualizar_var(this.id, valor.valor, valor.type);
+
+                    //retornar el valor
+                    return { value: valor.valor, type: TipoPrimitivo.Integer };
+
+                }
+            }
+
         }
 
         return { value: null, type: TipoPrimitivo.Null};

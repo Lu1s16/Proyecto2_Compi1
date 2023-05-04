@@ -215,8 +215,8 @@ INSTRUCCION : DEC_VAR  ';'              { $$ = $1; }
               | break ';'
               | continue ';'
               | RETURN                  { $$ = $1; }
-              | EXPRESIONES '++' ';'
-              | EXPRESIONES '--' ';'
+              | EXPRESIONES '++' ';'    { $$ = new OperacionesUnarios($1, $2, @1.first_line, @1.first_column); }
+              | EXPRESIONES '--' ';'    { $$ = new OperacionesUnarios($1, $2, @1.first_line, @1.first_column); }
               | METODOS
               | FUNCIONES               { $$ = $1; }
               | LLAMADA ';'             { $$ = $1; }
@@ -296,8 +296,7 @@ FOR : for '(' DEC_VAR ';'  EXPRESIONES ';' ACTUALIZACION ')' STATEMENT  { $$ = n
 
 
 ACTUALIZACION : id '++'        { $$ = new OperacionesUnarios($1, $2, @1.first_line, @1.first_column); }
-              | EXPRESIONES '--'
-              | ASIG_VAR
+              | id '--'        { $$ = new OperacionesUnarios($1, $2, @1.first_line, @1.first_column); }
 ;
 
 DO_WHILE : do '{' INSTRUCCIONES '}' while '(' EXPRESIONES ')' ';'

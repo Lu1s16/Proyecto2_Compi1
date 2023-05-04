@@ -1,4 +1,3 @@
-import { Return } from "./Return";
 import { TipoPrimitivo } from "./TipoPrimitivo";
 
 export class Variable {
